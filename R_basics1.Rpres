@@ -1,0 +1,441 @@
+R basics 1 - Working with data  
+========================================================
+author: Kevin Shook
+date: November 30, 2017
+autosize: true
+
+R equals
+========================================================
+- **R** has 3 equals signs: 
+- ```<-``` is used for assigning a value:
+  - to insert the symbol in Rstudio, type **[Alt][-]**
+```{r}
+a <- seq(1,5)
+a
+```
+***
+- ```==``` is used for comparing values
+  - used in ```if``` statements or for selecting by value
+```{r}
+a == 5
+```
+
+
+
+- ```=``` is used for specifying parameters in functions:
+```{r}
+mean(x = a)
+```
+
+Data types
+========================================================
+- Classes of data include numeric, character, logical
+- Types of data include scalars, vectors, data frames, matrices, arrays, lists, and factors
+- Vectors are created using c()
+```{r}
+a <- c(1,2,3,4,5)
+a
+class(a)
+```
+
+Character strings
+========================================================
+```{r}
+a <- c("1", "2", "dog")
+a
+```
+- ```paste()`` combines character strings
+```{r}
+paste('dog', 'cat', sep = "")
+```
+***
+```{r}
+paste('dog', 'cat', sep = "-")
+```
+
+Data frames
+========================================================
+- Data frames are collections of vectors  
+- The vectors can be of any type, but must have the same size
+```{r}
+animal <- c("cat", "horse", "dog", "shark")
+mammal <- c(TRUE, TRUE, TRUE, FALSE)
+df <- data.frame(animal, mammal, stringsAsFactors = FALSE)
+df
+```
+
+Factors
+========================================================
+- Factors look like character variables, but are actually numbers  
+- Good for categorizing values
+```{r}
+animal <- c("cat", "horse", "dog", "shark")
+type <- c("mammal", "mammal", "mammal", "fish")
+type <- factor(type)
+df2 <- data.frame(animal, type, stringsAsFactors = FALSE)
+```
+***
+```{r}
+df2
+summary(df2)
+```
+
+Lists
+========================================================
+- Lists can contain any other data types, which can be of any length  
+- However, lists are a pain to use
+- You reference list elements using 2 sets of square brackets, i.e. ```[[]]```
+```{r}
+b <- list("my list", df2)
+b
+````
+***
+```{r}
+b[[2]]$animal
+```
+
+names() lists all of the names in an object
+========================================================
+```{r}
+names(df2)
+names(df2)[1]
+```
+
+***
+- Also renames variables
+```{r}
+names(df2) <- c("Animal", "Type") 
+df2
+```
+
+File paths
+========================================================
+- **R** uses Unix-style delimiters, i.e. ```/```, even in Windows
+  - the symbol ```\``` is used to indicate special (escape) characters
+- To see your current directory use ```getwd()```  
+- In Linux or OSX :
+```{r, echo=FALSE}
+getwd()
+```
+
+***
+- In Windows you will see something like  
+```
+  [1] "C:/Users/kevin/Documents"
+```
+- In Windows you can also use 2 backslashes: ```\\``` as delimiters
+
+Loading and saving variables
+========================================================
+- Sets of variables can be saved to a binary file using ```save()```
+  - saves to file with extension ```.RData```
+- Use ```load()``` to load values
+```{r}
+load("R_basics_1.RData")
+```
+- Need to specify the path, if the file is not in the current directory
+- Click on the variable name in the Environment tab to see more info 
+  - double-click to display the data frame as a table
+
+***
+![](environment.png)
+
+Viewing data frames
+========================================================
+![](peakQ.png)
+
+Data frame referencing
+========================================================
+- You need to be able to select parts of a data frame
+- Each variable is identified by name using ```$```
+```{r}
+peakQ$YEAR
+```
+
+***
+- values can be indexed by the variable name and row number
+```{r}
+peakQ$YEAR[3]
+```
+
+***
+or by row and column number
+```{r}
+peakQ[3, 3]
+```
+
+Data frame referencing 2
+========================================================
+- Omit the row or column to specify *all* of the rows or columns
+```{r}
+peakQ[, 3]
+```
+ ***
+- You can specify *some* of the rows or columns
+- as a range of rows/columns using ```:```peakQ[1:3, 3]
+```
+***
+- or with a vector
+```{r}
+peakQ[c(1, 4), 3]
+```
+
+Data frame referencing 3
+========================================================
+- Can also specify using logical values
+  - only returns rows or columns where the expression is ```TRUE```
+```{r}
+peakQ[peakQ$YEAR >= 1990, c(3, 11)]
+```
+
+Data frame referencing 4
+========================================================
+- You can omit rows and/or columns using the minus sign
+```{r}
+peakQ[, 3]
+peakQ[-(c(1, 3, 4)), 3]
+```
+
+Dates
+========================================================
+- In **R**, dates are created using ```as.Date()```
+  - converts character to a ``Date`` object
+    - number of days since 1970-01-01
+  - need to specify the date format if not y-m-d
+  - can also use ```format()``` to convert a date to another format
+  - ?strptime to get date formatting strings
+
+Date examples
+========================================================
+```{r}
+d <- as.Date("2017-11-30")
+d
+d + 1
+```
+
+***
+- Changing date output format
+```{r}
+format(d, format = "%A, %B %d, %Y")
+```
+
+
+Times
+========================================================
+- Several ways of converting date-time strings to objects
+- Simplest is probably to use ```as.POSIXct()```
+  - seconds since 1970-01-01 00:00
+  - have to specity the format if not y-m-d h:m:s
+  - have to specify the time zone of the data, if not yours
+
+Time examples
+========================================================
+```{r}
+dt <- as.POSIXct("2017-11-30 12:30", format = "%Y-%m-%d %H:%M")
+dt
+dt <- as.POSIXct("30/11/2017 12:30", format = "%d/%m/%Y %H:%M")
+dt
+dt + 1
+```
+
+Exercise #1
+========================================================
+- ```load()``` the file ```R_basics1.RData```
+- Will be working with the data frame ```peakQ```
+- Delete these variables: 
+  - STATION_NUMBER, DATA_TYPE, PEAK_CODE, PRECISION_CODE
+- Add a new variable called ```peak_time``` and
+
+***
+  - fill it with the date and time of the peak in the format YEAR-MONTH-DAY HOUR:MINUTE
+    - hint - use ```paste()```
+  - convert ```peak_time``` to an **R** date/time
+  - plot the peak flows against the date/time
+  
+Exercise #1 solution
+========================================================
+```{r}
+load("R_basics_1.RData")
+peakQ <- peakQ[, -c(1, 2, 4, 5)]
+peakQ$datetime <- paste(peakQ$YEAR,"-", peakQ$MONTH, "-", peakQ$DAY," ", peakQ$HOUR,":", peakQ$MINUTE, sep = "")
+
+peakQ$datetime <- as.POSIXct(peakQ$datetime, format = "%Y-%m-%d %H:%M", tz = "MST")
+
+head(peakQ$datetime)
+```  
+
+Exercise #1 graph
+========================================================
+```{r}
+plot(peakQ$datetime, peakQ$PEAK, type = "p")
+```
+
+***
+
+```{r}
+library(ggplot2)
+ggplot(peakQ, aes(datetime, PEAK)) + geom_point() + theme_gray(24)
+```
+
+
+Sorting
+========================================================
+- There is a ```sort`` command - don't use it as it only works for vectors
+- Use ```order()``` instead
+```{r, eval=FALSE}
+order(x, decreasing = FALSE)
+```
+- Returns the index of the values, in ascending (default) or descending order.
+
+Ordering examples
+========================================================
+```{r}
+peakQ$PEAK
+order(peakQ$PEAK)
+```
+***
+```{r}
+peakQ$PEAK[order(peakQ$PEAK)]
+peakQ$YEAR[order(peakQ$PEAK)]
+```
+
+Aggregating
+========================================================
+- Use ```aggregate()``` to summarize data by subsets
+  - like a pivot table in a spreadsheet
+  - need to specify data, variable to summarize by, and the function to use
+```{r, eval=FALSE}
+aggregate(x, by = list(variables), FUN = function)
+```
+- Covered last week in the **Introduction to R**
+- Aggregation "by" variables are in a list - can specify more than one variable
+- Can specify *any* function which accepts a vector of values
+  - popular functions are ```min```, ```max```, ```mean```, ```sum```
+  
+Exercise #2
+========================================================
+- look at the data frame ```Calgary``` (already loaded)
+- convert the date to an R date
+- calculate the total precipitation for each year
+
+- hints:
+  - use ```as.Date()``` to convert the character date to an R date 
+  - use ```format(Calgary$date, format = "%Y")``` to create variable for the year
+  - use ```aggregate()``` to get the total  
+  
+- extra work:
+  - calculate the total precipitation for each month of each year
+  
+
+Exercise #2 solution
+========================================================
+```{r}
+Calgary <- na.omit(Calgary)
+Calgary$date <- as.Date(Calgary$date, format = "%Y-%m-%d")
+summary(Calgary)
+```
+
+Add year and month and aggregate
+========================================================
+```{r}
+Calgary$year <- as.numeric(format(Calgary$date, format = "%Y"))
+head(Calgary, n=3)
+yearly <- aggregate(Calgary$precip, by = list(Calgary$year), FUN = "sum")
+head(yearly, n=3)
+```
+
+Extra work
+========================================================
+```{r}
+Calgary$month <- as.numeric(format(Calgary$date, format = "%m"))
+month_by_year <- aggregate(Calgary$precip, by = list(Calgary$month, Calgary$year),
+                    FUN = c("sum"))
+head(month_by_year)
+```
+
+Another method
+========================================================
+```{r}
+Calgary$year_month <- format(Calgary$date, format = "%Y-%m")
+month_by_year2  <- aggregate(Calgary$precip, by = list(Calgary$year_month),
+                              FUN = "sum")
+head(month_by_year2)
+```
+
+Finding values
+========================================================
+- it's often useful to find the location (row number) of a value in a data frame
+- use ```which(), which.max(), which.min()```
+```{r}
+max(Calgary$precip)
+which.max(Calgary$precip)
+```
+***
+```{r}
+Calgary[which.max(Calgary$precip),1:3]
+```
+
+Adding rows and columns
+========================================================
+- combining 2 or more data frames
+- you can add extra columns using ```cbind()``` (column bind)
+  - all columns must have the same number of rows  
+- extra rows can be added using ```rbind()``` (row bind)
+  - all data frames must have same number of columns with the same names
+
+Adding rows
+========================================================
+```{r}
+df
+```
+***
+```{r}
+df <- rbind(df, c("chicken", FALSE))
+df
+```
+  
+Combining data frames
+========================================================
+- often need to combine data frames with differing numbers of rows and/or columns
+  - like a LOOKUP function in a spreadsheet  
+```{r, eval=FALSE}
+ merge(x, y, by = "variable")
+```  
+- data frames ```x``` and ```y``` need to have a common variable to merge **by**
+  - easiest if the variable has the same name in both data frames
+- the resulting data frame will have all columns *except*
+   that the common column will only appear once
+
+Exercise #3
+========================================================
+- Plot the instaneous peak flows (in data frame ```peakQ```) against the mean flows on the same day (in data frame  ```dailyQ```)
+- Hints:
+  - merge ```peakQ``` and ```dailyQ``` by the date
+  - requires converting the variable ```datetime``` in ```peakQ``` to a date
+    - use the function ```as.Date()```
+  - plot the merged data frame
+
+Exercise #3 solution
+========================================================
+- Add the date to ```peakQ```
+```{r}
+peakQ$date <- as.Date(peakQ$datetime)
+head(peakQ, n=3)
+```
+
+Exercise #3 solution cont'd
+========================================================
+- Merge data frames
+```{r}
+merged <- merge(peakQ, dailyQ, by = "date")
+head(merged, n=3)
+```
+
+
+Exercise #3 graph
+========================================================
+```{r}
+ggplot(merged, aes(Q, PEAK)) + geom_point(colour = "red", size = 3) + 
+  geom_abline(slope = 1, intercept = 0) + xlab("Mean daily discharge (m³/s)") +
+  ylab("Instantaneous peak discharge (m³/s)") + theme_bw(20)
+```
